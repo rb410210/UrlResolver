@@ -24,74 +24,70 @@ import org.apache.commons.io.IOUtils;
 @Path("/")
 public class HlsResource {
 
-    
 	@GET
-    @Path("getHlsAsMkv.ts")
-    @Produces("video/ts")
+	@Path("getHlsAsMkv.ts")
+	@Produces("video/ts")
 	public Response getHlsAsMkv() {
 		try {
 			System.out.println("Calling getHlsAsMkv");
 			StreamingOutput stream = new StreamingOutput() {
 				@SuppressWarnings("unused")
 				@Override
-				public void write(OutputStream os) throws IOException,
-						WebApplicationException {
+				public void write(OutputStream os) throws IOException, WebApplicationException {
 					String fileName = "/tmp/hlsDownloader.txt";
 					String lastPart = null;
-					
-					a:
-					while(true) {
-						BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+
+					a: while (true) {
+						BufferedReader reader = new BufferedReader(
+								new InputStreamReader(new FileInputStream(fileName)));
 						String line;
 						Set<String> parts = new LinkedHashSet<String>();
-						while((line=reader.readLine())!=null) {
-					    	if(!line.isEmpty()) {
-					    		parts.add(line);
-					    		
-					    	}
-					    }
-						
-						if(lastPart==null || !parts.contains(lastPart)) {
-							for(String part: parts) {
+						while ((line = reader.readLine()) != null) {
+							if (!line.isEmpty()) {
+								parts.add(line);
+
+							}
+						}
+
+						if (lastPart == null || !parts.contains(lastPart)) {
+							for (String part : parts) {
 								lastPart = part;
 								System.out.println(part);
 								File file = new File(part);
-					    		if(file.exists()) {
-					    			IOUtils.copy(new FileInputStream(file),os);
-					    		}
+								if (file.exists()) {
+									IOUtils.copy(new FileInputStream(file), os);
+								}
 							}
 						} else {
 							boolean skip = true;
-							for(String part: parts) {
-								if(skip) {
-									if(part.equals(lastPart)) {
+							for (String part : parts) {
+								if (skip) {
+									if (part.equals(lastPart)) {
 										skip = false;
 									}
 								} else {
 									lastPart = part;
 									File file = new File(part);
-						    		if(file.exists()) {
-						    			IOUtils.copy(new FileInputStream(file),os);
-						    		}
+									if (file.exists()) {
+										IOUtils.copy(new FileInputStream(file), os);
+									}
 								}
 							}
-							//break a;
-							
+							// break a;
+
 						}
-						
+
 						reader.close();
 					}
 				}
 			};
-			return Response.ok(stream)
-					.header("Content-Length", "1452930260")
+			return Response.ok(stream).header("Content-Length", "1452930260")
 					.header("X-Content-Duration", "00:01:00.046")
-					.header("Content-Disposition", "attachment; filename=\"play me.mkv\"")
-					.build();
+					.header("Content-Disposition", "attachment; filename=\"play me.mkv\"").build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
 	}
-     
+
 }

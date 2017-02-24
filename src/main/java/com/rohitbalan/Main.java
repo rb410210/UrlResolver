@@ -12,31 +12,34 @@ import java.net.URI;
  *
  */
 public class Main {
-    // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://0.0.0.0:9888/";
+	// Base URI the Grizzly HTTP server will listen on
+	public static final String BASE_URI = "http://0.0.0.0:9888/";
 
-    /**
-     * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
-     * @return Grizzly HTTP server.
-     */
-    public static HttpServer startServer() {
-        // create a resource config that scans for JAX-RS resources and providers
-        // in com.rohitbalan package
-        final ResourceConfig rc = new ResourceConfig().packages("com.rohitbalan");
+	/**
+	 * Starts Grizzly HTTP server exposing JAX-RS resources defined in this
+	 * application.
+	 * 
+	 * @return Grizzly HTTP server.
+	 */
+	public static HttpServer startServer() {
+		// create a resource config that scans for JAX-RS resources and
+		// providers
+		// in com.rohitbalan package
+		final ResourceConfig rc = new ResourceConfig().packages("com.rohitbalan");
 
-        // create and start a new instance of grizzly http server
-        // exposing the Jersey application at BASE_URI
-        return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
-    }
+		// create and start a new instance of grizzly http server
+		// exposing the Jersey application at BASE_URI
+		return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
+	}
 
-    /**
-     * Main method.
-     * @param args
-     * @throws IOException
-     */
-    public static void main(String[] args) throws IOException {
-        startServer();
-        
-    }
+	/**
+	 * Main method.
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws IOException {
+		startServer();
+
+	}
 }
-

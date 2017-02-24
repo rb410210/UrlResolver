@@ -27,35 +27,28 @@ import com.rohitbalan.core.OktvService;
  */
 @Path("/")
 public class OktvResource {
-    
-    @GET
-    @Path("urlresolver")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getOklivetv(@QueryParam("id") String id) {
-        return new OktvService().resolvedUrl(id);
-    }
-    
-    
-    
+
+	@GET
+	@Path("urlresolver")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getOklivetv(@QueryParam("id") String id) {
+		return new OktvService().resolvedUrl(id);
+	}
+
 	@GET
 	@Path("getMergedTs")
 	@Produces("video/mp4")
-	public Response getMergedTs(final @QueryParam("url") String url) throws URISyntaxException, InterruptedException
-	{
+	public Response getMergedTs(final @QueryParam("url") String url) throws URISyntaxException, InterruptedException {
 		System.out.println("Calling getMergedTs: " + url);
 
-		StreamingOutput stream = new StreamingOutput()
-		{
+		StreamingOutput stream = new StreamingOutput() {
 
 			@Override
-			public void write(OutputStream out) throws IOException, WebApplicationException
-			{
+			public void write(OutputStream out) throws IOException, WebApplicationException {
 				int SEGMENT_SIZE = 2048;
-				try
-				{
+				try {
 					byte[] subset = null;
-					while (true)
-					{
+					while (true) {
 						long startTime = Calendar.getInstance().getTimeInMillis();
 						byte[] bytes = new OktvService().getBinaryContentFromUrl(url);
 						System.out.print("Length: " + bytes.length + "\t");
@@ -66,67 +59,61 @@ public class OktvResource {
 						}
 						int percent;
 						byte[] newData;
-						if(subset==null) {
+						if (subset == null) {
 							newData = bytes;
 						} else {
 							int index = indexOf(bytes, subset);
 							System.out.print("index: " + index + "\t");
-							if(index == -1) {
+							if (index == -1) {
 								newData = bytes;
 							} else {
 								newData = Arrays.copyOfRange(bytes, index + SEGMENT_SIZE, bytes.length);
 							}
 						}
-						
-						percent = (newData.length) *100 / bytes.length;
+
+						percent = (newData.length) * 100 / bytes.length;
 						System.out.print("Percent: " + percent + "%\t");
 						out.write(newData);
-						
+
 						subset = Arrays.copyOfRange(bytes, bytes.length - SEGMENT_SIZE, bytes.length);
 						long endTime = Calendar.getInstance().getTimeInMillis();
-						
+
 						/*
-						long sleepTime = (bytes.length
-								//- index - SEGMENT_SIZE
-								)/229;
-						*/
-						
+						 * long sleepTime = (bytes.length //- index -
+						 * SEGMENT_SIZE )/229;
+						 */
+
 						long sleepTime = getVideoDurationInMilliSeconds(newData);
 						System.out.print("sleepTime: " + sleepTime + "\t");
 						long downloadTime = endTime - startTime;
 						System.out.print("downloadTime: " + downloadTime + "\t");
-						
-						if(sleepTime > downloadTime) {
+
+						if (sleepTime > downloadTime) {
 							long correctedSleepTime = sleepTime - downloadTime - 2000l;
 							System.out.print("correctedSleepTime: " + correctedSleepTime + "\t");
-							
-							
-							if(correctedSleepTime < 100l)
+
+							if (correctedSleepTime < 100l)
 								correctedSleepTime = 100l;
-							if(correctedSleepTime > 8000l)
+							if (correctedSleepTime > 8000l)
 								correctedSleepTime = 8000l;
-							
-							
+
 							Thread.sleep(correctedSleepTime);
 						}
 						System.out.println();
 					}
-				}
-				catch (InterruptedException e)
-				{
+				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		};
 		return Response.ok(stream)
-				//.header("Content-Length", "10000000000")
+				// .header("Content-Length", "10000000000")
 				.build();
 	}
-	
+
 	private int getVideoDurationInMilliSeconds(byte[] bytes) {
-		try
-		{
+		try {
 			String videoDuration = "";
 			File video = File.createTempFile("OkTv", ".ts");
 			Files.write(bytes, video);
@@ -134,11 +121,10 @@ public class OktvResource {
 			InputStream is = process.getInputStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			String line;
-			
+
 			Pattern p = Pattern.compile("^duration=(.*)$");
-			
-			while ((line = br.readLine()) != null)
-			{
+
+			while ((line = br.readLine()) != null) {
 				Matcher m = p.matcher(line);
 				while (m.find()) {
 					videoDuration = m.group(1);
@@ -148,27 +134,25 @@ public class OktvResource {
 			int videoDurationInMilliSeconds = (int) (Float.parseFloat(videoDuration) * 1000);
 			System.out.print("videoDuration: " + videoDurationInMilliSeconds + "\t");
 			return videoDurationInMilliSeconds;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 			return 10000;
 		}
 	}
-	
+
 	public int indexOf(byte[] outerArray, byte[] smallerArray) {
-	    for(int i = 0; i < outerArray.length - smallerArray.length+1; ++i) {
-	        boolean found = true;
-	        for(int j = 0; j < smallerArray.length; ++j) {
-	           if (outerArray[i+j] != smallerArray[j]) {
-	               found = false;
-	               break;
-	           }
-	        }
-	        if (found) return i;
-	     }
-	   return -1;  
-	}  
-    
-     
+		for (int i = 0; i < outerArray.length - smallerArray.length + 1; ++i) {
+			boolean found = true;
+			for (int j = 0; j < smallerArray.length; ++j) {
+				if (outerArray[i + j] != smallerArray[j]) {
+					found = false;
+					break;
+				}
+			}
+			if (found)
+				return i;
+		}
+		return -1;
+	}
+
 }

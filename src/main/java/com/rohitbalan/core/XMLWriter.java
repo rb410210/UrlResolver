@@ -17,20 +17,18 @@ import org.w3c.dom.Element;
 
 import com.rohitbalan.modal.Channel;
 
-public class XMLWriter
-{
+public class XMLWriter {
 	public void createXML(String category, List<Channel> channels) throws Exception {
 		File outputFolder = new File("output");
 		outputFolder.mkdir();
-		
 
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-		
+
 		Document doc = docBuilder.newDocument();
 		Element rootElement = doc.createElement("feed");
 		doc.appendChild(rootElement);
-		
+
 		Element resultLength = doc.createElement("resultLength");
 		resultLength.appendChild(doc.createTextNode("" + channels.size()));
 		rootElement.appendChild(resultLength);
@@ -38,14 +36,14 @@ public class XMLWriter
 		Element endIndex = doc.createElement("endIndex");
 		endIndex.appendChild(doc.createTextNode("1"));
 		rootElement.appendChild(endIndex);
-		
-		for(Channel channel: channels) {
+
+		for (Channel channel : channels) {
 			Element item = doc.createElement("item");
 			Attr imageAttr = doc.createAttribute("hdImg");
 			imageAttr.setValue(channel.getThumbnail());
 			item.setAttributeNode(imageAttr);
 			rootElement.appendChild(item);
-			
+
 			Element title = doc.createElement("title");
 			title.appendChild(doc.createTextNode(channel.getName()));
 			item.appendChild(title);
@@ -74,8 +72,7 @@ public class XMLWriter
 			media.appendChild(streamUrl);
 
 		}
-		
-		
+
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
 		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -84,15 +81,11 @@ public class XMLWriter
 		String filename = category.replace(" ", "_") + ".xml";
 		System.out.println(filename + "\t" + category);
 		StreamResult result = new StreamResult(new File(outputFolder, filename));
-		try
-		{
+		try {
 			transformer.transform(source, result);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 
 	}
 }

@@ -12,18 +12,18 @@ import javax.ws.rs.core.MediaType;
 @Path("/")
 public class DramaFeverResource {
 
-    /**
-     * Method handling HTTP GET requests. The returned object will be sent
-     * to the client as "text/plain" media type.
-     *
-     * @return String that will be returned as a text/plain response.
-     */
+	/**
+	 * Method handling HTTP GET requests. The returned object will be sent to
+	 * the client as "text/plain" media type.
+	 *
+	 * @return String that will be returned as a text/plain response.
+	 */
 	@GET
-    @Path("getDramaFeverSubtitle")
-    @Produces(MediaType.TEXT_PLAIN)
-    public File getDramaFeverSubtitle() {
-    	System.out.println("Calling getDramaFeverSubtitle");
-        return new File("/home/rohit/.kodi/temp/dramafever.English.srt");
-    }
-     
+	@Path("getDramaFeverSubtitle")
+	@Produces(MediaType.TEXT_PLAIN)
+	public File getDramaFeverSubtitle() {
+		System.out.println("Calling getDramaFeverSubtitle");
+		return new File("/home/rohit/.kodi/temp/dramafever.English.srt");
+	}
+
 }
